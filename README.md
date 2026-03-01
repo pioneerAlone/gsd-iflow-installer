@@ -1,5 +1,8 @@
 # GSD (Get Shit Done) for iFlow CLI 安装指南
 
+[![Test Installation Scripts](https://github.com/pioneerAlone/gsd-iflow-installer/actions/workflows/test.yml/badge.svg)](https://github.com/pioneerAlone/gsd-iflow-installer/actions/workflows/test.yml)
+[![Release](https://github.com/pioneerAlone/gsd-iflow-installer/actions/workflows/release.yml/badge.svg)](https://github.com/pioneerAlone/gsd-iflow-installer/actions/workflows/release.yml)
+
 本指南帮助你在 **iFlow CLI** 中安装和配置 GSD (Get Shit Done) 插件。
 
 ## 📋 目录

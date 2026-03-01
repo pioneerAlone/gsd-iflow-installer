@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  verify-before-release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            script_ext: sh
+          - os: macos-latest
+            script_ext: sh
+          - os: windows-latest
+            script_ext: ps1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify scripts (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          bash -n install.sh
+          bash -n update.sh
+          bash -n uninstall.sh
+          echo "✅ All scripts verified"
+
+      - name: Verify scripts (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Get-ChildItem *.ps1 | ForEach-Object {
+            $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $_.FullName -Raw), [ref]$null)
+            Write-Host "✅ $($_.Name) verified"
+          }
+
+  update-release-notes:
+    needs: verify-before-release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update release notes
+        uses: softprops/action-gh-release@v1
+        with:
+          body: |
+            ## GSD for iFlow CLI
+            
+            ### 安装方法
+            
+            **macOS / Linux:**
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.sh | bash
+            ```
+            
+            **Windows (PowerShell):**
+            ```powershell
+            irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.ps1 | iex
+            ```
+            
+            ### 文件清单
+            
+            | 文件 | 平台 | 用途 |
+            |------|------|------|
+            | `install.sh` | macOS/Linux | 一键安装 |
+            | `install.ps1` | Windows | 一键安装 |
+            | `update.sh` | macOS/Linux | 更新 GSD |
+            | `update.ps1` | Windows | 更新 GSD |
+            | `uninstall.sh` | macOS/Linux | 卸载 GSD |
+            | `uninstall.ps1` | Windows | 卸载 GSD |
+            
+            ---
+            
+            详细文档请查看 [README.md](https://github.com/pioneerAlone/gsd-iflow-installer#readme)

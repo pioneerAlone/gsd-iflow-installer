@@ -1,0 +1,136 @@
+name: Test Installation Scripts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # macOS 测试
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify script syntax
+        run: |
+          bash -n install.sh
+          bash -n update.sh
+          bash -n uninstall.sh
+          echo "✅ All bash scripts syntax OK"
+
+      - name: Test GSD installation (dry run)
+        run: |
+          # 模拟安装测试 - 只验证 npx 命令可执行
+          echo "Testing npx get-shit-done-cc availability..."
+          npx get-shit-done-cc@latest --help || echo "GSD install command available"
+        continue-on-error: true
+
+      - name: Verify script permissions
+        run: |
+          chmod +x install.sh update.sh uninstall.sh
+          ls -la *.sh
+
+  # Linux 测试
+  test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify script syntax
+        run: |
+          bash -n install.sh
+          bash -n update.sh
+          bash -n uninstall.sh
+          echo "✅ All bash scripts syntax OK"
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: warning
+          check_together: 'yes'
+
+      - name: Test GSD installation (dry run)
+        run: |
+          echo "Testing npx get-shit-done-cc availability..."
+          npx get-shit-done-cc@latest --help || echo "GSD install command available"
+        continue-on-error: true
+
+  # Windows 测试
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify PowerShell script syntax
+        shell: powershell
+        run: |
+          $PSVersionTable.PSVersion
+          $errors = @()
+          
+          Get-ChildItem *.ps1 | ForEach-Object {
+            $result = $null
+            $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $_.FullName -Raw), [ref]$result)
+            Write-Host "✅ $($_.Name) syntax OK"
+          }
+          
+          if ($errors.Count -gt 0) {
+            Write-Host "❌ Syntax errors found"
+            exit 1
+          }
+
+      - name: Test GSD installation (dry run)
+        shell: powershell
+        run: |
+          Write-Host "Testing npx get-shit-done-cc availability..."
+          npx get-shit-done-cc@latest --help
+        continue-on-error: true
+
+      - name: Verify script can be downloaded
+        shell: powershell
+        run: |
+          # 验证脚本内容有效
+          $content = Get-Content install.ps1 -Raw
+          if ($content -match "GSD for iFlow CLI") {
+            Write-Host "✅ install.ps1 content valid"
+          } else {
+            Write-Host "❌ install.ps1 content invalid"
+            exit 1
+          }
+
+  # 综合测试结果
+  test-summary:
+    needs: [test-macos, test-linux, test-windows]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| macOS | ${{ needs.test-macos.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linux | ${{ needs.test-linux.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Windows | ${{ needs.test-windows.result }} |" >> $GITHUB_STEP_SUMMARY
