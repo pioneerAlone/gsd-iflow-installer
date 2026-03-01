@@ -137,7 +137,7 @@ fi
 # 下载更新脚本
 echo ""
 echo "📥 下载更新脚本..."
-curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/update.sh -o ~/.iflow/update-gsd.sh 2>/dev/null && chmod +x ~/.iflow/update-gsd.sh || echo "   跳过更新脚本下载（可手动下载）"
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/unix/update.sh -o ~/.iflow/update-gsd.sh 2>/dev/null && chmod +x ~/.iflow/update-gsd.sh || echo "   跳过更新脚本下载（可手动下载）"
 
 # 完成
 echo ""

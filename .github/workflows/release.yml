@@ -5,19 +5,15 @@ on:
     types: [published]
   workflow_dispatch:
 
+env:
+  IFLOW_INSTALL_SCRIPT: "https://gitee.com/iflow-ai/iflow-cli/raw/main/install.sh"
+
 jobs:
   verify-before-release:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            script_ext: sh
-          - os: macos-latest
-            script_ext: sh
-          - os: windows-latest
-            script_ext: ps1
 
     steps:
       - name: Checkout repository
@@ -28,19 +24,35 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install iFlow CLI (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          echo "Installing iFlow CLI..."
+          bash -c "$(curl -fsSL $IFLOW_INSTALL_SCRIPT)" || true
+          echo "✅ iFlow CLI installation attempted"
+
+      - name: Install iFlow CLI (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Write-Host "iFlow CLI Windows requires manual setup"
+        continue-on-error: true
+
       - name: Verify scripts (Unix)
         if: runner.os != 'Windows'
         run: |
+          cd scripts/unix
           bash -n install.sh
           bash -n update.sh
           bash -n uninstall.sh
-          echo "✅ All scripts verified"
+          echo "✅ All Unix scripts verified"
 
       - name: Verify scripts (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          Get-ChildItem *.ps1 | ForEach-Object {
+          $scriptDir = "scripts/windows"
+          Get-ChildItem "$scriptDir/*.ps1" | ForEach-Object {
             $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $_.FullName -Raw), [ref]$null)
             Write-Host "✅ $($_.Name) verified"
           }
@@ -59,28 +71,50 @@ jobs:
           body: |
             ## GSD for iFlow CLI
             
+            ### 前置要求
+            
+            请先安装 iFlow CLI：
+            ```bash
+            bash -c "$(curl -fsSL https://gitee.com/iflow-ai/iflow-cli/raw/main/install.sh)"
+            ```
+            
             ### 安装方法
             
             **macOS / Linux:**
             ```bash
-            curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.sh | bash
+            curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/unix/install.sh | bash
             ```
             
             **Windows (PowerShell):**
             ```powershell
-            irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.ps1 | iex
+            irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/install.ps1 | iex
             ```
             
-            ### 文件清单
+            ### 更新方法
             
-            | 文件 | 平台 | 用途 |
-            |------|------|------|
-            | `install.sh` | macOS/Linux | 一键安装 |
-            | `install.ps1` | Windows | 一键安装 |
-            | `update.sh` | macOS/Linux | 更新 GSD |
-            | `update.ps1` | Windows | 更新 GSD |
-            | `uninstall.sh` | macOS/Linux | 卸载 GSD |
-            | `uninstall.ps1` | Windows | 卸载 GSD |
+            **macOS / Linux:**
+            ```bash
+            ~/.iflow/update-gsd.sh
+            ```
+            
+            **Windows (PowerShell):**
+            ```powershell
+            & "$env:USERPROFILE\.iflow\update-gsd.ps1"
+            ```
+            
+            ### 文件结构
+            
+            ```
+            scripts/
+            ├── unix/
+            │   ├── install.sh
+            │   ├── update.sh
+            │   └── uninstall.sh
+            └── windows/
+                ├── install.ps1
+                ├── update.ps1
+                └── uninstall.ps1
+            ```
             
             ---
             

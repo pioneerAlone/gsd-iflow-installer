@@ -120,7 +120,7 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsFile
 # 下载更新脚本
 Write-Host ""
 Write-Host "📥 下载更新脚本..." -ForegroundColor Yellow
-$updateScriptUrl = "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/update.ps1"
+$updateScriptUrl = "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/update.ps1"
 $updateScriptPath = "$iflowDir\update-gsd.ps1"
 
 try {

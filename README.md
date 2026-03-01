@@ -22,7 +22,17 @@
 
 - Node.js 18+
 - npm 或 npx
-- iFlow CLI 已安装
+- **iFlow CLI 已安装**
+
+### 安装 iFlow CLI
+
+**macOS / Linux:**
+```bash
+bash -c "$(curl -fsSL https://gitee.com/iflow-ai/iflow-cli/raw/main/install.sh)"
+```
+
+**Windows:**
+> 请访问 [iFlow CLI 官网](https://iflow.cn) 获取 Windows 安装指南
 
 ---
 
@@ -32,16 +42,17 @@
 
 **macOS / Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/unix/install.sh | bash
 ```
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/install.ps1 | iex
 ```
 
 ### 方法二：手动安装
 
+**macOS / Linux:**
 ```bash
 # 1. 安装 GSD 到 Gemini CLI 目录
 npx get-shit-done-cc@latest --gemini --global
@@ -207,7 +218,7 @@ Get-ChildItem "$env:USERPROFILE\.iflow\commands\gsd\*.toml" | ForEach-Object {
 **macOS / Linux:**
 ```bash
 # 下载更新脚本
-curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/update.sh -o ~/.iflow/update-gsd.sh
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/unix/update.sh -o ~/.iflow/update-gsd.sh
 chmod +x ~/.iflow/update-gsd.sh
 
 # 运行更新
@@ -217,7 +228,7 @@ chmod +x ~/.iflow/update-gsd.sh
 **Windows (PowerShell):**
 ```powershell
 # 下载更新脚本
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/update.ps1" -OutFile "$env:USERPROFILE\.iflow\update-gsd.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/update.ps1" -OutFile "$env:USERPROFILE\.iflow\update-gsd.ps1"
 
 # 运行更新
 & "$env:USERPROFILE\.iflow\update-gsd.ps1"
@@ -322,7 +333,7 @@ sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/co
 
 **macOS / Linux:**
 ```bash
-~/.iflow/uninstall-gsd.sh
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/unix/uninstall.sh | bash
 ```
 
 **Windows (PowerShell):**
@@ -332,9 +343,27 @@ sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/co
 
 ---
 
-## 文件结构
+## 仓库文件结构
 
-安装完成后的目录结构：
+```
+gsd-iflow-installer/
+├── .github/
+│   └── workflows/
+│       ├── test.yml       # CI 测试工作流
+│       └── release.yml    # 发布工作流
+├── scripts/
+│   ├── unix/              # macOS/Linux 脚本
+│   │   ├── install.sh
+│   │   ├── update.sh
+│   │   └── uninstall.sh
+│   └── windows/           # Windows 脚本
+│       ├── install.ps1
+│       ├── update.ps1
+│       └── uninstall.ps1
+└── README.md
+```
+
+## 安装后目录结构
 
 **macOS / Linux:**
 ```
@@ -359,8 +388,7 @@ sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/co
 ├── settings.json      # iFlow 配置
 ├── gsd-file-manifest.json
 ├── package.json
-├── update-gsd.sh      # 更新脚本 (macOS/Linux)
-└── update-gsd.ps1     # 更新脚本 (Windows)
+└── update-gsd.sh      # 更新脚本
 ```
 
 **Windows:**
