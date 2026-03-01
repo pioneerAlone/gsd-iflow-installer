@@ -27,9 +27,14 @@
 
 ### 方法一：使用安装脚本（推荐）
 
+**macOS / Linux:**
 ```bash
-# 下载并运行安装脚本
 curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.ps1 | iex
 ```
 
 ### 方法二：手动安装
@@ -51,6 +56,33 @@ cp ~/.gemini/package.json ~/.iflow/
 
 # 4. 修复路径引用
 sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/commands/gsd/*.toml
+
+# 5. 配置 settings.json（见下方说明）
+```
+
+**Windows (PowerShell):**
+```powershell
+# 1. 安装 GSD 到 Gemini CLI 目录
+npx get-shit-done-cc@latest --gemini --global
+
+# 2. 创建 iFlow 配置目录
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.iflow\commands"
+
+# 3. 复制 GSD 文件到 iFlow 目录
+Copy-Item -Path "$env:USERPROFILE\.gemini\commands\gsd" -Destination "$env:USERPROFILE\.iflow\commands\" -Recurse
+Copy-Item -Path "$env:USERPROFILE\.gemini\agents" -Destination "$env:USERPROFILE\.iflow\" -Recurse
+Copy-Item -Path "$env:USERPROFILE\.gemini\get-shit-done" -Destination "$env:USERPROFILE\.iflow\" -Recurse
+Copy-Item -Path "$env:USERPROFILE\.gemini\hooks" -Destination "$env:USERPROFILE\.iflow\" -Recurse
+Copy-Item -Path "$env:USERPROFILE\.gemini\gsd-file-manifest.json" -Destination "$env:USERPROFILE\.iflow\" -ErrorAction SilentlyContinue
+Copy-Item -Path "$env:USERPROFILE\.gemini\package.json" -Destination "$env:USERPROFILE\.iflow\" -ErrorAction SilentlyContinue
+
+# 4. 修复路径引用
+$userHome = $env:USERPROFILE -replace '\\', '/'
+Get-ChildItem "$env:USERPROFILE\.iflow\commands\gsd\*.toml" | ForEach-Object {
+    $content = Get-Content $_.FullName -Raw
+    $content = $content -replace "$userHome/\.gemini/", "$userHome/\.iflow/"
+    Set-Content -Path $_.FullName -Value $content -NoNewline
+}
 
 # 5. 配置 settings.json（见下方说明）
 ```
@@ -169,6 +201,7 @@ sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/co
 
 #### 方法一：使用更新脚本（推荐）
 
+**macOS / Linux:**
 ```bash
 # 下载更新脚本
 curl -fsSL https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/update.sh -o ~/.iflow/update-gsd.sh
@@ -178,7 +211,18 @@ chmod +x ~/.iflow/update-gsd.sh
 ~/.iflow/update-gsd.sh
 ```
 
+**Windows (PowerShell):**
+```powershell
+# 下载更新脚本
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/update.ps1" -OutFile "$env:USERPROFILE\.iflow\update-gsd.ps1"
+
+# 运行更新
+& "$env:USERPROFILE\.iflow\update-gsd.ps1"
+```
+
 #### 方法二：手动更新
+
+**macOS / Linux:**
 
 ```bash
 # 1. 重新安装到 Gemini 目录
@@ -194,6 +238,30 @@ cp ~/.gemini/package.json ~/.iflow/
 
 # 3. 修复路径引用
 sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/commands/gsd/*.toml
+
+# 4. 重启 iFlow CLI
+```
+
+**Windows (PowerShell):**
+```powershell
+# 1. 重新安装到 Gemini 目录
+npx get-shit-done-cc@latest --gemini --global
+
+# 2. 复制更新后的文件
+Copy-Item -Path "$env:USERPROFILE\.gemini\commands\gsd" -Destination "$env:USERPROFILE\.iflow\commands\" -Recurse -Force
+Copy-Item -Path "$env:USERPROFILE\.gemini\agents" -Destination "$env:USERPROFILE\.iflow\" -Recurse -Force
+Copy-Item -Path "$env:USERPROFILE\.gemini\get-shit-done" -Destination "$env:USERPROFILE\.iflow\" -Recurse -Force
+Copy-Item -Path "$env:USERPROFILE\.gemini\hooks" -Destination "$env:USERPROFILE\.iflow\" -Recurse -Force
+Copy-Item -Path "$env:USERPROFILE\.gemini\gsd-file-manifest.json" -Destination "$env:USERPROFILE\.iflow\" -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$env:USERPROFILE\.gemini\package.json" -Destination "$env:USERPROFILE\.iflow\" -Force -ErrorAction SilentlyContinue
+
+# 3. 修复路径引用
+$userHome = $env:USERPROFILE -replace '\\', '/'
+Get-ChildItem "$env:USERPROFILE\.iflow\commands\gsd\*.toml" | ForEach-Object {
+    $content = Get-Content $_.FullName -Raw
+    $content = $content -replace "$userHome/\.gemini/", "$userHome/\.iflow/"
+    Set-Content -Path $_.FullName -Value $content -NoNewline
+}
 
 # 4. 重启 iFlow CLI
 ```
@@ -239,12 +307,33 @@ sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/co
 2. 确认 `settings.json` 中 hooks 配置正确
 3. 检查 Node.js 是否在 PATH 中
 
+### 问题：Windows 路径问题
+
+**解决方案：**
+- Windows 使用 `$env:USERPROFILE\.iflow\` 代替 `~/.iflow/`
+- 确保使用 PowerShell 运行脚本，不要使用 CMD
+
+---
+
+## 卸载
+
+**macOS / Linux:**
+```bash
+~/.iflow/uninstall-gsd.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+& "$env:USERPROFILE\.iflow\uninstall-gsd.ps1"
+```
+
 ---
 
 ## 文件结构
 
 安装完成后的目录结构：
 
+**macOS / Linux:**
 ```
 ~/.iflow/
 ├── commands/
@@ -267,7 +356,21 @@ sed -i '' "s|/Users/$(whoami)/\.gemini/|/Users/$(whoami)/\.iflow/|g" ~/.iflow/co
 ├── settings.json      # iFlow 配置
 ├── gsd-file-manifest.json
 ├── package.json
-└── update-gsd.sh      # 更新脚本
+├── update-gsd.sh      # 更新脚本 (macOS/Linux)
+└── update-gsd.ps1     # 更新脚本 (Windows)
+```
+
+**Windows:**
+```
+C:\Users\<用户名>\.iflow\
+├── commands\gsd\
+├── agents\
+├── get-shit-done\
+├── hooks\
+├── settings.json
+├── gsd-file-manifest.json
+├── package.json
+└── update-gsd.ps1
 ```
 
 ---
