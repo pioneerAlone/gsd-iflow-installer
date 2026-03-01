@@ -71,8 +71,10 @@ cp ~/.gemini/package.json ~/.iflow/ 2>/dev/null || true
 
 # 4. 修复路径引用
 echo "  [4/4] 修复路径引用..."
+# shellcheck disable=SC2116
 USER_HOME=$(echo ~)
-sed -i '' "s|$USER_HOME/\.gemini/|$USER_HOME/\.iflow/|g" ~/.iflow/commands/gsd/*.toml 2>/dev/null || \.
+# shellcheck disable=SC1090
+sed -i '' "s|$USER_HOME/\.gemini/|$USER_HOME/\.iflow/|g" ~/.iflow/commands/gsd/*.toml 2>/dev/null || \
 sed -i "s|$USER_HOME/\.gemini/|$USER_HOME/\.iflow/|g" ~/.iflow/commands/gsd/*.toml
 
 # 完成

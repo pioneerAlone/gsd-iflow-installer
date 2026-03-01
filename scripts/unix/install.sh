@@ -41,6 +41,7 @@ cp ~/.gemini/package.json ~/.iflow/ 2>/dev/null || true
 # 步骤 4: 修复路径引用
 echo ""
 echo "🔧 步骤 4/5: 修复路径引用..."
+# shellcheck disable=SC2116
 USER_HOME=$(echo ~)
 sed -i '' "s|$USER_HOME/\.gemini/|$USER_HOME/\.iflow/|g" ~/.iflow/commands/gsd/*.toml 2>/dev/null || \
 sed -i "s|$USER_HOME/\.gemini/|$USER_HOME/\.iflow/|g" ~/.iflow/commands/gsd/*.toml
@@ -146,6 +147,7 @@ echo "║  ✅ GSD 安装完成！                                         ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo ""
 echo "📁 安装位置: ~/.iflow/"
+# shellcheck disable=SC2012
 echo "📝 命令数量: $(ls ~/.iflow/commands/gsd/*.toml 2>/dev/null | wc -l | tr -d ' ')"
 echo ""
 echo "下一步:"
