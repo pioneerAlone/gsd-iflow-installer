@@ -82,36 +82,46 @@ if (-not $settings.experimental) {
 }
 $settings.experimental | Add-Member -NotePropertyName "enableAgents" -NotePropertyValue $true -Force
 
-# 添加 hooks
-$hooks = @{
-    SessionStart = @(
-        @{
-            hooks = @(
-                @{
-                    type = "command"
-                    command = "node \"$env:USERPROFILE\.iflow\hooks\gsd-check-update.js\""
-                }
-            )
-        }
-    )
-    PostToolUse = @(
-        @{
-            hooks = @(
-                @{
-                    type = "command"
-                    command = "node \"$env:USERPROFILE\.iflow\hooks\gsd-context-monitor.js\""
-                }
-            )
-        }
-    )
-}
-$settings | Add-Member -NotePropertyName "hooks" -NotePropertyValue $hooks -Force
+# 构建 hooks 路径（PowerShell 5.1 兼容：用 JSON 字符串构建复杂对象）
+$hookBase = $env:USERPROFILE.Replace('\', '/') + '/.iflow/hooks'
 
-# 添加 statusLine
-$statusLine = @{
-    type = "command"
-    command = "node \"$env:USERPROFILE\.iflow\hooks\gsd-statusline.js\""
+$hooksJson = @"
+{
+    "SessionStart": [
+        {
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": "node \"$hookBase/gsd-check-update.js\""
+                }
+            ]
+        }
+    ],
+    "PostToolUse": [
+        {
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": "node \"$hookBase/gsd-context-monitor.js\""
+                }
+            ]
+        }
+    ]
 }
+"@
+
+$statusLineJson = @"
+{
+    "type": "command",
+    "command": "node \"$hookBase/gsd-statusline.js\""
+}
+"@
+
+# 解析 JSON 并添加到 settings
+$hooks = $hooksJson | ConvertFrom-Json
+$statusLine = $statusLineJson | ConvertFrom-Json
+
+$settings | Add-Member -NotePropertyName "hooks" -NotePropertyValue $hooks -Force
 $settings | Add-Member -NotePropertyName "statusLine" -NotePropertyValue $statusLine -Force
 
 # 保存 settings

@@ -13,7 +13,7 @@ $versionFile = "$iflowDir\get-shit-done\VERSION"
 # 获取当前版本
 $currentVersion = "unknown"
 if (Test-Path $versionFile) {
-    $currentVersion = Get-Content $versionFile -Raw).Trim()
+    $currentVersion = (Get-Content $versionFile -Raw).Trim()
     Write-Host "📌 当前版本: $currentVersion"
 }
 
