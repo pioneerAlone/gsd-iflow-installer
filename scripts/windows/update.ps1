@@ -1,9 +1,11 @@
 # GSD for iFlow CLI 更新脚本 (Windows PowerShell)
-# 用法: ~/.iflow/update-gsd.ps1
+# 用法:
+#   本地执行: ~/.iflow/update-gsd.ps1
+#   远程执行: irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/update.ps1 | iex
 
-Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║  GSD for iFlow CLI Updater (Windows)                       ║" -ForegroundColor Cyan
-Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "  GSD for iFlow CLI Updater (Windows)" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
 $iflowDir = "$env:USERPROFILE\.iflow"
@@ -94,11 +96,11 @@ if (Test-Path $versionFile) {
 
 # 完成
 Write-Host ""
-Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║  ✅ GSD 更新完成！                                         ║" -ForegroundColor Green
-Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
+Write-Host "  GSD 更新完成!" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
 Write-Host ""
-Write-Host "版本变化: $currentVersion → $newVersion"
+Write-Host "版本变化: $currentVersion -> $newVersion"
 Write-Host ""
-Write-Host "⚠️  请重启 iFlow CLI 以应用更新" -ForegroundColor Yellow
+Write-Host "请重启 iFlow CLI 以应用更新" -ForegroundColor Yellow
 Write-Host ""

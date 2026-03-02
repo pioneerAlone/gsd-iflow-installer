@@ -1,9 +1,11 @@
 # GSD for iFlow CLI 卸载脚本 (Windows PowerShell)
-# 用法: ~/.iflow/uninstall-gsd.ps1
+# 用法:
+#   本地执行: ~/.iflow/uninstall-gsd.ps1
+#   远程执行: irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/uninstall.ps1 | iex
 
-Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║  GSD for iFlow CLI Uninstaller (Windows)                   ║" -ForegroundColor Cyan
-Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "  GSD for iFlow CLI Uninstaller (Windows)" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
 $iflowDir = "$env:USERPROFILE\.iflow"
@@ -67,7 +69,7 @@ if (Test-Path $settingsFile) {
 
 # 完成
 Write-Host ""
-Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║  ✅ GSD 已卸载                                             ║" -ForegroundColor Green
-Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
+Write-Host "  GSD 已卸载" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
 Write-Host ""

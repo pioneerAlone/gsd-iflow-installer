@@ -1,9 +1,9 @@
 # GSD for iFlow CLI 安装脚本 (Windows PowerShell)
-# 用法: irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/install.ps1 | iex
+# 用法: irm https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/install.ps1 | iex
 
-Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║  GSD for iFlow CLI Installer (Windows)                     ║" -ForegroundColor Cyan
-Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "  GSD for iFlow CLI Installer (Windows)" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
 # 检查 Node.js
@@ -127,17 +127,26 @@ $settings | Add-Member -NotePropertyName "statusLine" -NotePropertyValue $status
 # 保存 settings
 $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsFile
 
-# 下载更新脚本
+# 下载更新和卸载脚本
 Write-Host ""
-Write-Host "📥 下载更新脚本..." -ForegroundColor Yellow
+Write-Host "下载管理脚本..." -ForegroundColor Yellow
 $updateScriptUrl = "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/update.ps1"
+$uninstallScriptUrl = "https://raw.githubusercontent.com/pioneerAlone/gsd-iflow-installer/main/scripts/windows/uninstall.ps1"
 $updateScriptPath = "$iflowDir\update-gsd.ps1"
+$uninstallScriptPath = "$iflowDir\uninstall-gsd.ps1"
 
 try {
     Invoke-WebRequest -Uri $updateScriptUrl -OutFile $updateScriptPath -UseBasicParsing
-    Write-Host "   更新脚本已下载"
+    Write-Host "   update-gsd.ps1 已下载"
 } catch {
-    Write-Host "   跳过更新脚本下载（可手动下载）" -ForegroundColor DarkGray
+    Write-Host "   跳过 update-gsd.ps1 下载" -ForegroundColor DarkGray
+}
+
+try {
+    Invoke-WebRequest -Uri $uninstallScriptUrl -OutFile $uninstallScriptPath -UseBasicParsing
+    Write-Host "   uninstall-gsd.ps1 已下载"
+} catch {
+    Write-Host "   跳过 uninstall-gsd.ps1 下载" -ForegroundColor DarkGray
 }
 
 # 统计命令数量
@@ -145,16 +154,18 @@ $commandCount = (Get-ChildItem "$commandsDir\gsd\*.toml" -ErrorAction SilentlyCo
 
 # 完成
 Write-Host ""
-Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║  ✅ GSD 安装完成！                                         ║" -ForegroundColor Green
-Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
+Write-Host "  GSD 安装完成!" -ForegroundColor Green
+Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
 Write-Host ""
-Write-Host "📁 安装位置: $iflowDir"
-Write-Host "📝 命令数量: $commandCount"
+Write-Host "安装位置: $iflowDir"
+Write-Host "命令数量: $commandCount"
 Write-Host ""
 Write-Host "下一步:"
 Write-Host "  1. 重启 iFlow CLI"
 Write-Host "  2. 运行 /gsd:help 验证安装"
 Write-Host ""
-Write-Host "更新 GSD: $updateScriptPath"
+Write-Host "管理命令:"
+Write-Host "  更新: $updateScriptPath"
+Write-Host "  卸载: $uninstallScriptPath"
 Write-Host ""
